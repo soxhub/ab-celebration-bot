@@ -21,12 +21,10 @@
     "url": "https://github.com/DEGoodmanWilson/easy-peasy-bot-app/issues"
   },
   "homepage": "https://github.com/DEGoodmanWilson/easy-peasy-bot-app#readme",
-  "engines": {
-    "node": "5.1.1"
-  },
   "dependencies": {
     "botkit": "0.2.2",
     "botkit-storage-mongo": "^1.0.2",
-    "mongodb": "^1.4.39"
+    "mongodb": "^1.4.39",
+    "pg": "^7.12.0"
   }
 }
