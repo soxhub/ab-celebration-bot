@@ -1,0 +1,27 @@
+#!/usr/bin/env node
+const  Pool  = require('pg').Pool;
+const moment = require('moment');
+
+const date = moment().format('M/DD');
+
+
+const pool = new Pool({
+	user: 'llangford',
+	host: 'localhost',
+	database: 'testdb',
+	password: '',
+	port: 5432,
+});
+
+
+
+pool.query(`select email from employee where birthday_date = '${date}'`, (err, res) => {
+	const names = Object.values(Object.values(res)[3][0]);
+	console.log(names);
+});
+
+pool.query(`select email from employee where to_char(anniversary_date,'FMMM/FMDD') = '${date}' `,(err,res) =>{
+	const names = Object.values(Object.values(res)[3][0]);
+	console.log(names);
+	pool.end();
+});
