@@ -83,7 +83,7 @@ async function postHappyBirthday() {
 	let users = await getUsers();
 	const res = await web.chat.postMessage({
 		channel: conversationId,
-		text: 'Happy Birthday to the following employees' + userId.toString(),
+		text: 'Happy Birthday to the following employees' + users.toString(),
 		attachments: [{"image_url": "https://i.imgur.com/qs8zp4j.gif"}]
 	});
 }
