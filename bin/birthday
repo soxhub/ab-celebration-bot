@@ -39,7 +39,7 @@ async function postHappyBirthday() {
 	const res = await web.chat.postMessage({
 		channel: conversationId,
 		text: 'Happy Birthday to the following employees' + users.toString(),
-		attachments: [{"image_url": "https://i.imgur.com/qs8zp4j.gif"}]
+		attachments: [{"title": "Happy Birthday!!!!","image_url": "https://i.imgur.com/qs8zp4j.gif"}]
 	});
 }
 
@@ -48,5 +48,6 @@ async function postHappyBirthday() {
 pool.query(`select email from employee where to_char(anniversary_date,'FMMM/FMDD') = '${date}' `,(err,res) =>{
 	const names = Object.values(Object.values(res)[3][0]);
 	console.log(names);
-	pool.end();
+
+
 });
