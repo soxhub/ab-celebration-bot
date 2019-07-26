@@ -17,37 +17,62 @@ const pool = new Pool({
 	port: 5432,
 });
 
-async function getUsers() {
-	let rows = await pool.query(`select email from employee where birthday_date = '${date}'`);
-	let emails = Object.values(rows)[3];
 
+async function getUsers(emails){
 	let emailList = emails.map(x => Object.values(x).pop());
 
 	const users = [];
 
 	for (const email of emailList) {
 		let trim = email.trim();
-		const res = await web.users.lookupByEmail({token: token, email: trim});
-		const id = (Object.values(Object.values(res)[1])[0]);
-		users.push('<@' + id + '>');
+		try {
+			const res = await web.users.lookupByEmail({token: token, email: trim});
+			const id = (Object.values(Object.values(res)[1])[0]);
+			users.push('<@' + id + '>');
+		}
+		catch(err) {
+			console.log(err);
+		}
 	}
 	return users;
+
+}
+
+async function getBirthdayUsers() {
+	let rows = await pool.query(`select email from employee where birthday_date = '${date}'`);
+	let emails = Object.values(rows)[3];
+	return getUsers(emails);
 }
 
 async function postHappyBirthday() {
-	let users = await getUsers();
-	const res = await web.chat.postMessage({
-		channel: conversationId,
-		text: 'Happy Birthday to the following employees' + users.toString(),
-		attachments: [{"title": "Happy Birthday!!!!","image_url": "https://i.imgur.com/qs8zp4j.gif"}]
-	});
+	let users = await getBirthdayUsers();
+	if (users.length) {
+		const res = await web.chat.postMessage({
+			channel: conversationId,
+			text: 'Happy Birthday to the following employees' + users.toString(),
+			attachments: [{"title": "Happy Birthday!!!!","image_url": "https://i.imgur.com/qs8zp4j.gif"}]
+		});
+	}
 }
 
-(async() => { await postHappyBirthday(); })();
+async function getAnniversaryUsers(){
+	let rows = await pool.query(`select email from employee where to_char(anniversary_date,'FMMM/FMDD') = '${date}' `);
+	const emails = Object.values(Object.values(rows)[3]);
+	return getUsers(emails);
+}
 
-pool.query(`select email from employee where to_char(anniversary_date,'FMMM/FMDD') = '${date}' `,(err,res) =>{
-	const names = Object.values(Object.values(res)[3][0]);
-	console.log(names);
+async function postAnniversary() {
+	let users = await getAnniversaryUsers();
+	if (users.length) {
+		const res = await web.chat.postMessage({
+			channel: conversationId,
+			text: 'Happy Anniversary to the following employees:' + users.toString(),
+			attachments: [{"title": "Happy Anniversary!!!!","image_url": "https://i.imgur.com/qs8zp4j.gif"}]
+		});
+	}
+}
 
-
-});
+(async() => {
+	await postHappyBirthday();
+	await postAnniversary();
+})();
