@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 const  Pool  = require('pg').Pool;
-const moment = require('moment');
+const moment = require('moment-timezone');
 const { WebClient } = require('@slack/web-api');
 const conversationId = process.env.CONVERSATION_ID;
 
