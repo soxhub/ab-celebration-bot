@@ -12,7 +12,7 @@ Our Celebration Bot reminds about birthdays and anniversaries using animated com
 With our Celebration Bot you can be sure you won’t miss the important date!
 
 
-![Celebration Bot](icon file.jpg)
+![Celebration Bot](profileBot.jpg)
 
 
  
