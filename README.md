@@ -1,4 +1,4 @@
-# Cerlebration Bot
+# Celebration Bot
 
 Our team consisted of Eugene, Mitch, Leah, Sieun, Michelle, Freddy, and Olena. 
 
