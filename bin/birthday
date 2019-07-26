@@ -5,7 +5,7 @@ const { WebClient } = require('@slack/web-api');
 const conversationId = 'CLSRUJMJQ';
 
 const date = moment().format('M/DD');
-const token = 'xoxb-2326495549-694802344034-FEqcSajHIlP9eYJLO5oSKX2U';
+const token = process.env.SLACK_ACCESS_TOKEN;
 const web = new WebClient(token);
 
 
