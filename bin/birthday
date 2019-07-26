@@ -1,8 +1,12 @@
 #!/usr/bin/env node
 const  Pool  = require('pg').Pool;
 const moment = require('moment');
+const { WebClient } = require('@slack/web-api');
+const conversationId = 'CLSRUJMJQ';
 
 const date = moment().format('M/DD');
+const token = 'xoxb-2326495549-694802344034-Cf3WBzjoKmn9Di9UMW8XmpfN';
+const web = new WebClient(token);
 
 
 const pool = new Pool({
@@ -15,10 +19,46 @@ const pool = new Pool({
 
 
 
-pool.query(`select email from employee where birthday_date = '${date}'`, (err, res) => {
-	const names = Object.values(Object.values(res)[3][0]);
-	console.log(names);
-});
+function getUserId (callback) {
+	pool.query(`select email from employee where birthday_date = '${date}'`, (err, res) => {
+		const emails = Object.values(res)[3];
+
+		let emailList = emails.map(x => Object.values(x).pop());
+
+		const userId = [];
+		var itemsProcessed = 0;
+
+		emailList.forEach((name) => {
+			let trim = name.trim();
+			(async () => {
+				const res = await web.users.lookupByEmail({token: token, email: trim});
+				const id = (Object.values(Object.values(res)[1])[0]);
+				userId.push('<@' + id + '>');
+				itemsProcessed++;
+				if (itemsProcessed === (emailList.length)){
+					callback(userId);
+				}
+			})();
+		});
+	});
+}
+
+function postMessage(userId) {
+	(async () => {
+		// See: https://api.slack.com/methods/chat.postMessage
+		const res = await web.chat.postMessage({
+												   channel: conversationId,
+												   text: 'Happy Birthday to the following employees' + userId.toString(),
+												   attachments: [{"img_url": "https://github.com/leahlang4d2/easy-peasy-bot/blob/master/celebration.gif?raw=true"}]
+											   });
+
+		// `res` contains information about the posted message
+		// console.log('Message sent: ', res);
+
+	})();
+}
+
+getUserId(postMessage);
 
 pool.query(`select email from employee where to_char(anniversary_date,'FMMM/FMDD') = '${date}' `,(err,res) =>{
 	const names = Object.values(Object.values(res)[3][0]);

@@ -22,6 +22,8 @@
   },
   "homepage": "https://github.com/leahlang4d2/easy-peasy-bot-app#readme",
   "dependencies": {
+    "@slack/events-api": "^2.2.0",
+    "@slack/web-api": "^5.0.1",
     "botkit": "0.2.2",
     "botkit-storage-mongo": "^1.0.2",
     "moment": "^2.24.0",
