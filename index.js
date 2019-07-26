@@ -86,7 +86,7 @@ controller.on('bot_channel_join', function (bot, message) {
 });
 
 controller.hears('hello', 'direct_message', function (bot, message) {
-    bot.reply(message, 'Hello!');
+    bot.reply(message, "Hi! I'm the celebration bot! I don't do much yet, but if you have suggestions, please contact @sjang or @leah !");
 });
 
 
