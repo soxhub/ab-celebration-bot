@@ -55,6 +55,9 @@ async function postAnniversary() {
 			as_user: false
 		});
 	}
+	else {
+		console.log('There were no anniversaries today');
+	}
 }
 
 (async() => {

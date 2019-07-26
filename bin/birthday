@@ -40,6 +40,9 @@ async function postHappyBirthday() {
 			as_user: false
 		});
 	}
+	else {
+		console.log('There were no birthdays today');
+	}
 }
 
 (async() => {
