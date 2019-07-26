@@ -11,37 +11,6 @@ const web = new WebClient(token);
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
-async function getBirthdayUsers() {
-	let users = await pool.query(`select "slackId" from employees_employee where "isActive" = 't' and to_char("birthDay",'FMMM/FMDD') = '${date}'`);
-	return users.rows;
-}
-
-async function postHappyBirthday() {
-	let users = await getBirthdayUsers();
-
-	let slackIds = [];
-	users.forEach((user) => {
-		slackIds.push(`<@${user.slackId}>`);
-	});
-	if (slackIds.length) {
-		let slackUsers;
-		if (slackIds.length <= 2) {
-			slackUsers = slackIds.join(' and ');
-		}
-		else {
-			slackIds[slackIds.length - 1] = 'and ' + slackIds[slackIds.length - 1];
-			slackUsers = slackIds.join(', ');
-		}
-		const res = await web.chat.postMessage({
-			channel: conversationId,
-			text: `Happy Birthday ${slackUsers}!!!`,
-			attachments: [{"title": "Happy Birthday!!!!","image_url": process.env.BIRTHDAY_IMAGE_URL}],
-			icon_emoji: ":birthday:",
-			as_user: false
-		});
-	}
-}
-
 async function getAnniversaryUsers(){
 	let users = await pool.query(`select "slackId", extract(YEAR FROM CURRENT_DATE) - extract(YEAR FROM "startDate") as num_years from employees_employee where "isActive" = 't' and to_char("startDate",'FMMM/FMDD') = '${date}' and extract(YEAR FROM CURRENT_DATE) - extract(YEAR FROM "startDate") > 0`);
 	return users.rows;
@@ -89,6 +58,5 @@ async function postAnniversary() {
 }
 
 (async() => {
-	await postHappyBirthday();
 	await postAnniversary();
 })();
