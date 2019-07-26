@@ -46,9 +46,11 @@ function getUserId (callback) {
 function postMessage(userId) {
 	(async () => {
 		// See: https://api.slack.com/methods/chat.postMessage
+
+		const bdayMessageArray = ['Think of it this way: You have just moved one year closer to your retirement!','Did you know my favorite coworker is having a birthday today? Have a great one!','Getting to work with someone as super as I am should be the only birthday present you really need. Plus, this present lasts all year long. Just in case, I got you another present as well. Happy birthday!','Here is to yet another 365-day trip around the sun. I hope you enjoy the trip as much this year as you did last year!','Here is to wishing you a year more successful, happy and productive than ever before. Have a great birthday—you deserve it!','Wishing you a great birthday and a memorable year!','Wishing you greatest birthday ever!','I wish you enjoy your special day. You deserve it!',];
 		const res = await web.chat.postMessage({
 												   channel: conversationId,
-												   text: 'Happy Birthday to the following employees' + userId.toString(),
+												   text: bdayMessageArray[Math.floor(Math.random() * bdayMessageArray.length)] + userId.toString(),
 												   attachments: [{"image_url": "https://i.imgur.com/qs8zp4j.gif"}]
 											   });
 
