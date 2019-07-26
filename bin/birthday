@@ -5,7 +5,7 @@ const { WebClient } = require('@slack/web-api');
 const conversationId = 'CLSRUJMJQ';
 
 const date = moment().format('M/DD');
-const token = 'xoxb-2326495549-694802344034-FEqcSajHIlP9eYJLO5oSKX2U';
+const token = process.env.SLACK_ACCESS_TOKEN;
 const web = new WebClient(token);
 
 
@@ -17,48 +17,33 @@ const pool = new Pool({
 	port: 5432,
 });
 
+async function getUsers() {
+	let rows = await pool.query(`select email from employee where birthday_date = '${date}'`);
+	let emails = Object.values(rows)[3];
 
+	let emailList = emails.map(x => Object.values(x).pop());
 
-function getUserId (callback) {
-	pool.query(`select email from employee where birthday_date = '${date}'`, (err, res) => {
-		const emails = Object.values(res)[3];
+	const users = [];
 
-		let emailList = emails.map(x => Object.values(x).pop());
+	for (const email of emailList) {
+		let trim = email.trim();
+		const res = await web.users.lookupByEmail({token: token, email: trim});
+		const id = (Object.values(Object.values(res)[1])[0]);
+		users.push('<@' + id + '>');
+	}
+	return users;
+}
 
-		const userId = [];
-		var itemsProcessed = 0;
-
-		emailList.forEach((name) => {
-			let trim = name.trim();
-			(async () => {
-				const res = await web.users.lookupByEmail({token: token, email: trim});
-				const id = (Object.values(Object.values(res)[1])[0]);
-				userId.push('<@' + id + '>');
-				itemsProcessed++;
-				if (itemsProcessed === (emailList.length)){
-					callback(userId);
-				}
-			})();
-		});
+async function postHappyBirthday() {
+	let users = await getUsers();
+	const res = await web.chat.postMessage({
+		channel: conversationId,
+		text: 'Happy Birthday to the following employees' + users.toString(),
+		attachments: [{"image_url": "https://i.imgur.com/qs8zp4j.gif"}]
 	});
 }
 
-function postMessage(userId) {
-	(async () => {
-		// See: https://api.slack.com/methods/chat.postMessage
-		const res = await web.chat.postMessage({
-												   channel: conversationId,
-												   text: 'Happy Birthday to the following employees' + userId.toString(),
-												   attachments: [{"image_url": "https://i.imgur.com/qs8zp4j.gif"}]
-											   });
-
-		// `res` contains information about the posted message
-		// console.log('Message sent: ', res);
-
-	})();
-}
-
-getUserId(postMessage);
+(async() => { await postHappyBirthday(); })();
 
 pool.query(`select email from employee where to_char(anniversary_date,'FMMM/FMDD') = '${date}' `,(err,res) =>{
 	const names = Object.values(Object.values(res)[3][0]);
