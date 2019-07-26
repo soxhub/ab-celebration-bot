@@ -88,7 +88,7 @@ async function postHappyBirthday() {
 	});
 }
 
-await postHappyBirthday();
+(async() => { await postHappyBirthday(); })();
 
 pool.query(`select email from employee where to_char(anniversary_date,'FMMM/FMDD') = '${date}' `,(err,res) =>{
 	const names = Object.values(Object.values(res)[3][0]);
