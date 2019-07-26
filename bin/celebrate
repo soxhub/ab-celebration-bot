@@ -1,0 +1,94 @@
+#!/usr/bin/env node
+const  Pool  = require('pg').Pool;
+const moment = require('moment');
+const { WebClient } = require('@slack/web-api');
+const conversationId = 'CLSRUJMJQ';
+
+const date = moment().format('M/DD');
+const token = process.env.SLACK_ACCESS_TOKEN;
+const web = new WebClient(token);
+
+
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
+async function getBirthdayUsers() {
+	let users = await pool.query(`select "slackId" from employees_employee where "isActive" = 't' and to_char("birthDay",'FMMM/FMDD') = '${date}'`);
+	return users.rows;
+}
+
+async function postHappyBirthday() {
+	let users = await getBirthdayUsers();
+
+	let slackIds = [];
+	users.forEach((user) => {
+		slackIds.push(`<@${user.slackId}>`);
+	});
+	if (slackIds.length) {
+		let slackUsers;
+		if (slackIds.length <= 2) {
+			slackUsers = slackIds.join(' and ');
+		}
+		else {
+			slackIds[slackIds.length - 1] = 'and ' + slackIds[slackIds.length - 1];
+			slackUsers = slackIds.join(', ');
+		}
+		const res = await web.chat.postMessage({
+			channel: conversationId,
+			text: `Happy Birthday ${slackUsers}!!!`,
+			attachments: [{"title": "Happy Birthday!!!!","image_url": process.env.BIRTHDAY_IMAGE_URL}],
+			icon_emoji: ":birthday:",
+			as_user: false
+		});
+	}
+}
+
+async function getAnniversaryUsers(){
+	let users = await pool.query(`select "slackId", extract(YEAR FROM CURRENT_DATE) - extract(YEAR FROM "startDate") as num_years from employees_employee where "isActive" = 't' and to_char("startDate",'FMMM/FMDD') = '${date}' and extract(YEAR FROM CURRENT_DATE) - extract(YEAR FROM "startDate") > 0`);
+	return users.rows;
+}
+
+async function postAnniversary() {
+	let users = await getAnniversaryUsers();
+
+	let yearsUsers = {};
+
+	users.forEach((user) => {
+		if (yearsUsers[user.num_years]) {
+			yearsUsers[user.num_years].push(`<@${user.slackId}>`);
+		} else {
+			yearsUsers[user.num_years] = [`<@${user.slackId}>`];
+		}
+	});
+
+	let numYears = Object.keys(yearsUsers);
+	if (numYears.length) {
+		for (const numYear of numYears) {
+			let slackUsers;
+			let slackIds = yearsUsers[numYear];
+			if (slackIds.length <= 2) {
+				slackUsers = slackIds.join(' and ');
+			}
+			else {
+				slackIds[slackIds.length - 1] = 'and ' + slackIds[slackIds.length - 1];
+				slackUsers = slackIds.join(', ');
+			}
+			await web.chat.postMessage({
+				channel: conversationId,
+				text: `Congrats to ${slackUsers} on your ${numYear} Year Anniversary!!!`,
+				icon_emoji: ":tada:",
+				as_user: false
+			});
+		}
+		await web.chat.postMessage({
+			channel: conversationId,
+			attachments: [{"title": "Happy Anniversary!!!!","image_url": process.env.ANNIVERSARY_IMAGE_URL}],
+			icon_emoji: ":tada:",
+			as_user: false
+		});
+	}
+}
+
+(async() => {
+	await postHappyBirthday();
+	await postAnniversary();
+})();
