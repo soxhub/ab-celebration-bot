@@ -60,23 +60,22 @@ function postMessage(userId) {
 // getUserId(postMessage);
 
 async function getUsers() {
-	pool.query(`select email from employee where birthday_date = '${date}'`, (err, res) => {
-		const emails = Object.values(res)[3];
+	let rows = await pool.query(`select email from employee where birthday_date = '${date}'`);
+	let emails = Object.values(res)[3];
 
-		let emailList = emails.map(x => Object.values(x).pop());
+	let emailList = emails.map(x => Object.values(x).pop());
 
-		const users = [];
-		var itemsProcessed = 0;
+	const users = [];
+	var itemsProcessed = 0;
 
-		emailList.forEach(async (name) => {
-			let trim = name.trim();
-			const res = await web.users.lookupByEmail({token: token, email: trim});
-			const id = (Object.values(Object.values(res)[1])[0]);
-			users.push('<@' + id + '>');
-		});
-
-		return users;
+	emailList.forEach(async (name) => {
+		let trim = name.trim();
+		const res = await web.users.lookupByEmail({token: token, email: trim});
+		const id = (Object.values(Object.values(res)[1])[0]);
+		users.push('<@' + id + '>');
 	});
+
+	return users;
 }
 
 async function postHappyBirthday() {
