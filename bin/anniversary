@@ -2,7 +2,7 @@
 const  Pool  = require('pg').Pool;
 const moment = require('moment');
 const { WebClient } = require('@slack/web-api');
-const conversationId = 'CLSRUJMJQ';
+const conversationId = process.env.CONVERSATION_ID;
 
 const date = moment().format('M/DD');
 const token = process.env.SLACK_ACCESS_TOKEN;
