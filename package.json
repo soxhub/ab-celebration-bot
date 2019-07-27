@@ -27,6 +27,7 @@
     "botkit": "0.2.2",
     "botkit-storage-mongo": "^1.0.2",
     "moment": "^2.24.0",
+    "moment-timezone": "^0.5.26",
     "mongodb": "^1.4.39",
     "pg": "^7.12.0"
   }
