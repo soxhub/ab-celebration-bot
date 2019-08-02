@@ -12,7 +12,7 @@ const web = new WebClient(token);
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 async function getBirthdayUsers() {
-	let users = await pool.query(`select "slackId" from employees_employee where "isActive" = 't' and to_char("birthDay",'FMMM/FMDD') = '${date}'`);
+	let users = await pool.query(`select "slackId" from employees_employee where "isActive" = 't' and to_char("birthDay",'MM/DD') = '${date}'`);
 	return users.rows;
 }
 
