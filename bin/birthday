@@ -4,7 +4,7 @@ const moment = require('moment-timezone');
 const { WebClient } = require('@slack/web-api');
 const conversationId = process.env.CONVERSATION_ID;
 
-const date = moment().tz('America/Los_Angeles').format('M/DD');
+const date = moment().tz('America/Los_Angeles').format('MM/DD');
 const token = process.env.SLACK_TOKEN;
 const web = new WebClient(token);
 
