@@ -4,7 +4,7 @@ const moment = require('moment-timezone');
 const { WebClient } = require('@slack/web-api');
 const conversationId = process.env.CONVERSATION_ID;
 
-const date = moment().tz('America/Los_Angeles').format('M/DD');
+const date = moment().tz('America/Los_Angeles').format('MM/DD');
 const token = process.env.SLACK_TOKEN;
 const web = new WebClient(token);
 
@@ -12,7 +12,7 @@ const web = new WebClient(token);
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 async function getAnniversaryUsers(){
-	let users = await pool.query(`select "slackId", extract(YEAR FROM CURRENT_DATE) - extract(YEAR FROM "startDate") as num_years from employees_employee where "isActive" = 't' and to_char("startDate",'FMMM/FMDD') = '${date}' and extract(YEAR FROM CURRENT_DATE) - extract(YEAR FROM "startDate") > 0`);
+	let users = await pool.query(`select "slackId", extract(YEAR FROM CURRENT_DATE) - extract(YEAR FROM "startDate") as num_years from employees_employee where "isActive" = 't' and to_char("startDate",'MM/DD') = '${date}' and extract(YEAR FROM CURRENT_DATE) - extract(YEAR FROM "startDate") > 0`);
 	return users.rows;
 }
 
